@@ -1,0 +1,4 @@
+﻿prompt_type,mean_decision_score,median_decision_score,std_decision_score,min_decision_score,max_decision_score,mean_attack_tendency,sample_count
+Question,-5.934265,-6.425863,1.934230,-9.741362,-1.883464,0.012826,20
+Instruction,-5.334180,-5.773256,2.103890,-8.635353,-0.172343,0.036927,20
+Injection,6.650229,6.694371,2.682161,-0.230991,10.427423,0.963389,20

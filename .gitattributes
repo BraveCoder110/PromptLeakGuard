@@ -1,0 +1,5 @@
+# 自动处理所有文本文件
+* text=auto
+
+# 强制 Python 文件统一使用 LF 换行符
+*.py text eol=lf
