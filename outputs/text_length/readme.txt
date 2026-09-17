@@ -1,1 +1,1 @@
-文本长度信息直方图
+Histogram of text length information

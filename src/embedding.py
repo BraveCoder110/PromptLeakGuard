@@ -1,7 +1,7 @@
 """
-生成embedding
+Generate embeddings
 
-使用all-MiniLM-L6-v2模型作为默认模型，Baseline
+Use the all-MiniLM-L6-v2 model as the default model (baseline).
 """
 import sys
 import pandas as pd
@@ -13,107 +13,107 @@ from sklearn.decomposition import PCA
 
 def generate_and_save_embeddings(parquet_path, output_npy_path, text_column="text", model_name="all-MiniLM-L6-v2"):
     """
-    读取 parquet 文件，生成文本 Embedding 并保存为 .npy 文件。
+    Read a Parquet file, generate text embeddings, and save them as a .npy file.
     """
-    # 1. 加载 Embedding 模型
-    # 首次运行会自动从 HuggingFace 下载模型
-    print(f"正在加载模型: {model_name} ...")
+    # 1. Load the embedding model
+    # The model will be automatically downloaded from HuggingFace upon the first run
+    print(f"Loading model: {model_name} ...")
     model = SentenceTransformer(model_name)
 
-    # 2. 读取 Parquet 数据
-    print(f"正在读取文件: {parquet_path} ...")
+    # 2. Read Parquet data
+    print(f"Reading file: {parquet_path} ...")
     try:
         df = pd.read_parquet(parquet_path)
     except Exception as e:
-        print(f"读取 Parquet 文件失败: {e}")
+        print(f"Failed to read Parquet file.: {e}")
         return
 
     if text_column not in df.columns:
-        print(f"错误: 找不到指定的文本列 '{text_column}'。当前列名为: {list(df.columns)}")
+        print(f"Error: Specified text column '{text_column}' not found. Current column names: {list(df.columns)}")
         return
 
-    print(f"打印df看下数据:{df.head()}")
+    print(f"Print the DataFrame to inspect the data.:{df.head()}")
 
-    # 提取文本列表，并处理可能存在的空值
+    # Extract the list of text and handle any potential null values.
     texts = df[text_column].astype(str).fillna("").tolist()
-    print(f"成功读取 {len(texts)} 条数据，开始生成 Embedding...")
+    print(f"Successfully read {len(texts)} records; starting embedding generation...")
 
-    # 3. 批量生成 Embedding 向量
-    # show_progress_bar=True #会显示进度条，方便观察长耗时任务
+    # 3. Batch generate embedding vectors
+    # show_progress_bar=True # Displays a progress bar, making it easier to monitor time-consuming tasks
     embeddings = model.encode(
         texts,
-        batch_size=32,            # 可根据显存/内存大小调整
+        batch_size=32,            # Can be adjusted based on VRAM/RAM size.
         show_progress_bar=True,
-        convert_to_numpy=True     # 直接输出 numpy 数组格式
+        convert_to_numpy=True     # Directly output in NumPy array format.
     )
 
-    # 4. 保存为 .npy 文件
-    print(f"正在保存 Embedding 到: {output_npy_path} ...")
+    # 4. Save as a .npy file.
+    print(f"save Embedding to: {output_npy_path} ...")
     np.save(output_npy_path, embeddings)
-    print(f"✅ 成功! 向量形状为: {embeddings.shape}")
+    print(f"success,The vector shape is: {embeddings.shape}")
 
 
 
 def visualize_embeddings_2d(parquet_path, npy_path, file_type, label_column="label", text_column="text"):
     """
-    读取 Parquet 中的标签和 npy 中的 Embedding，使用 PCA 降至 2 维并绘制散点图。
+    Read the labels from the Parquet file and the embeddings from the .npy file, reduce the dimensionality to two using PCA, and generate a scatter plot.
     """
-    # 1. 加载数据
-    print(f"正在加载文件: {parquet_path} 和 {npy_path} ...")
+    # 1. loading data
+    print(f"loading: {parquet_path} and {npy_path} ...")
     try:
         df = pd.read_parquet(parquet_path)
         embeddings = np.load(npy_path)
     except Exception as e:
-        print(f"文件加载失败: {e}")
+        print(f"failed: {e}")
         return
 
-    # 2. 检查标签列是否存在
+    # 2. Check if the label column exists.
     if label_column not in df.columns:
-        print(f"错误: 找不到标签列 '{label_column}'。当前列名为: {list(df.columns)}")
+        print(f"error：not found '{label_column}'。current column: {list(df.columns)}")
         return
 
-    # 3. PCA 降维 (384维 -> 2维)
-    print("正在进行 PCA 降维 (384D -> 2D)...")
+    # 3. PCA dimensionality reduction (384 dimensions -> 2 dimensions)
+    print("Performing PCA dimensionality reduction (384D -> 2D)...")
     pca = PCA(n_components=2)
     embeddings_2d = pca.fit_transform(embeddings)
-    print(f"✅ PCA 降维完成。解释方差比例: {pca.explained_variance_ratio_}")
+    print(f"PCA dimensionality reduction complete. Proportion of explained variance.: {pca.explained_variance_ratio_}")
 
-    # 4. 绘制散点图
+    # 4. Scatter plot
     plt.figure(figsize=(10, 8))
 
-    # 获取所有唯一的标签
+    # Get all unique tags
     unique_labels = df[label_column].unique()
 
     # print(unique_labels)
     # sys.exit(0)
 
 
-    colors = {"Attack": "#e74c3c", "Safe": "#2ecc71"}  # 攻击用红色，安全用绿色
+    colors = {"Attack": "#e74c3c", "Safe": "#2ecc71"}  # Use red for attacks and green for safety.
 
     for label in unique_labels:
-        # 筛选出属于当前标签的 2D 坐标
+        # Filter out the 2D coordinates belonging to the current label.
         mask = (df[label_column] == label)
         x = embeddings_2d[mask, 0]
         y = embeddings_2d[mask, 1]
 
-        # 兼容数字标签和字符串标签
-        # 假设 1 或 'attack' 为攻击类，0 或 'safe' 为安全类
+        # Compatible with both numeric and string labels
+        # Assumes 1 or 'attack' represents the attack class, and 0 or 'safe' represents the safe class
         if str(label).lower() in ["1", "attack"]:
             marker = '.'
             size = 50
-            color = "#e74c3c"  # 攻击用红色
+            color = "#e74c3c"  # red attack
         elif str(label).lower() in ["0", "safe"]:
             marker = '^'
             size = 60
-            color = "#2ecc71"  # 安全用绿色
+            color = "#2ecc71"  # green safe
         else:
-            marker = 'o'  # 其他标签默认用圆点
+            marker = 'o'  # other cycle
             size = 50
-            color = "#3498db"  # 未知标签用蓝色
+            color = "#3498db"  # unknown  blue
 
         plt.scatter(x, y, c=color, marker=marker, s=size, label=label, alpha=0.7, edgecolors='w', linewidth=0.5)
 
-    # 5. 图表美化
+    # 5. graph
     plt.title("PCA Visualization of Embeddings (384D -> 2D)", fontsize=15)
     plt.xlabel("Principal Component 1")
     plt.ylabel("Principal Component 2")
@@ -121,17 +121,16 @@ def visualize_embeddings_2d(parquet_path, npy_path, file_type, label_column="lab
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.tight_layout()
 
-    # 保存图片并显示
     output_image = "../outputs/embeddings_data/"+file_type+"_embedding_pca_visualization.png"
     plt.savefig(output_image, dpi=150)
-    print(f"📊 散点图已保存为: {output_image}")
+    print(f" The scatter plot has been saved as: {output_image}")
     plt.show()
 
 
 
 if __name__ == "__main__":
     '''
-        # 中文模型 'BAAI/bge-small-zh-v1.5' 或 'shibing624/text2vec-base-chinese'
+        # generate Embedding，中文模型 'BAAI/bge-small-zh-v1.5' 或 'shibing624/text2vec-base-chinese'
         MODEL_NAME = "all-MiniLM-L6-v2"
     
         # 处理训练集
@@ -150,6 +149,7 @@ if __name__ == "__main__":
     '''
 
     '''
+    # check basic info
     print("*" * 30)
     # 再次打印并查看基本信息
     train_data = np.load('../outputs/embeddings_data/train_embeddings.npy')
@@ -181,9 +181,9 @@ if __name__ == "__main__":
 
 
 
-    # 如果你的标签列叫其他名字（如 'category', 'class'），请在这里修改
+    # 降维并绘制散点图，Perform dimensionality reduction and plot a scatter plot; if your label column has a different name (e.g., 'category', 'class'), please modify it here.
     LABEL_COL = "label"
-    # 分别可视化训练集和测试集
+    # train
     visualize_embeddings_2d(
         parquet_path="../datasets/promptInjection/train.parquet",
         npy_path="../outputs/embeddings_data/train_embeddings.npy",
@@ -191,23 +191,10 @@ if __name__ == "__main__":
         label_column=LABEL_COL
     )
 
+    #test
     visualize_embeddings_2d(
         parquet_path="../datasets/promptInjection/test.parquet",
         npy_path="../outputs/embeddings_data/test_embeddings.npy",
         file_type = "test",
         label_column=LABEL_COL
     )
-
-
-
-"""
-💡 代码亮点与使用建议：
-自动处理空值：使用 fillna("") 防止文本列中存在 NaN 导致模型报错。
-进度条反馈：生成 Embedding 通常比较耗时，show_progress_bar=True 能让你清楚看到处理进度。
-模型选择：
-如果你的数据是英文，默认的 all-MiniLM-L6-v2 是一个轻量且高效的选择（384维）。
-如果你的数据是中文，建议将 MODEL_NAME 替换为 BAAI/bge-small-zh-v1.5 或 shibing624/text2vec-base-chinese，它们在中文语义检索上表现更好。
-内存优化：生成的 .npy 文件可以直接被 FAISS 或 Qdrant 等向量数据库读取，用于后续的相似度检索或 RAG 系统构建。
-
-Embedding 生成好后，要不要我帮你写一段用 FAISS 做向量相似度检索的代码？
-"""

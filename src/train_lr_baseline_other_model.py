@@ -100,5 +100,4 @@ if __name__ == "__main__":
 鲁棒的指标计算：使用了 average="macro" 来计算 Precision、Recall 和 F1，这样无论你的标签是数字（0/1）还是字符串，都能正确计算。同时加入了 zero_division=0 防止极端情况报错。
 可视化混淆矩阵：利用 sklearn 内置的 ConfusionMatrixDisplay 绘制了直观的混淆矩阵，并自动保存为图片。
 模型稳定性：在 LogisticRegression 中设置了 max_iter=1000，防止 384 维特征导致模型不收敛而抛出警告；设置 random_state=42 保证每次运行结果可复现。
-运行这段代码后，你将在控制台看到清晰的评估指标，并在当前目录下得到一张混淆矩阵图片。
 '''

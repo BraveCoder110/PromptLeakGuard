@@ -1,25 +1,25 @@
 import joblib
 import numpy as np
 
-# 全局加载模型，避免每次调用都重新加载，提高性能
+# Load the model globally to avoid reloading it on every call and improve performance.
 MODEL_PATH = "./models/bge_m3_lr.joblib"
-print(f"🚀 正在加载模型包: {MODEL_PATH} ...")
+print(f"loading: {MODEL_PATH} ...")
 try:
     model_bundle = joblib.load(MODEL_PATH)
     encoder = model_bundle["encoder"]
     classifier = model_bundle["classifier"]
-    print("✅ 模型加载成功！")
+    print("model loading complete.！")
 except Exception as e:
-    raise RuntimeError(f"模型加载失败，请先运行 train_model.py。错误: {e}")
+    raise RuntimeError(f"failed，please run train_model.py。error: {e}")
 
 def predict_prompt(text: str) -> dict:
     """
-    最小预测函数：输入文本，输出标签和攻击概率。
+    Minimal prediction function: takes text as input and outputs a label and an attack probability.
     """
     if not text or not isinstance(text, str):
         return {"label": "Safe", "attack_probability": 0.0}
 
-    # 1. 生成 Embedding (必须与训练时保持一致：normalize_embeddings=True，注意设置normalize_embeddings时，train_model.py也要，且重新生成模型)
+    # 1. Generate embeddings (must be consistent with the training configuration: `normalize_embeddings=True`; note that if `normalize_embeddings` is set, `train_model.py` must also be updated and the model regenerated).
     embedding = encoder.encode(
         [text],
         batch_size=32,            # 可根据显存/内存大小调整
