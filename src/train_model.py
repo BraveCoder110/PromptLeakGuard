@@ -89,6 +89,6 @@ if __name__ == "__main__":
 
 
 '''
-detail.csv：每条文本的 OOF 决策分数、Attack 倾向值和预测标签。
-summary.csv：Question、Instruction、Injection 三类的平均分、标准差、最小值、最大值等。
+detail.csv: OOF decision scores, attack propensity values, and predicted labels for each text entry.
+summary.csv: Average scores, standard deviations, minimum values, maximum values, etc., for the Question, Instruction, and Injection categories.
 '''

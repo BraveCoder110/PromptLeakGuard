@@ -1,16 +1,15 @@
 """
-生成embedding
+Generating embeddings
 
-使用其他模型：
-1. multilingual-e5-small多语言能力
-2. BGE-small-en强语义
-3. BGE-M3 多语言 + 长文本
+Using other models:
+1. multilingual-e5-small: Multilingual capabilities
+2. BGE-small-en: Strong semantic capabilities
+3. BGE-M3: Multilingual + long-text support
 
 Can Better Semantic Representation Reduce False Negatives?
 
-科研假设:
-Hypothesis H1：采用更强的多语言语义表示，可以显著减少跨语言 Prompt Injection 的 False Negative。
-
+Hypothesis:
+Hypothesis H1: Employing stronger multilingual semantic representations can significantly reduce false negatives in cross-language prompt injection.
 """
 import sys
 import pandas as pd
