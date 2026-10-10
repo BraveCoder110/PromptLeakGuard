@@ -1,6 +1,6 @@
 以后论文的Introduction和Discussion
 
-1.我们为什么研究Prompt Injection？ 此处在写的时候注意在chatgpt里在搜一遍
+1.我们为什么研究Prompt Injection？ 
 随着ChatGPT、DeepSeek等大语言模型被广泛应用，Prompt Injection（提示词注入）已成为最常见的安全威胁之一。本项目聚焦于输入安全检测这一关键环节，通过构建轻量级语义分析模型，对用户输入进行风险识别，并输出攻击类型、风险等级和检测结果，为大模型提供第一道安全防线。
 identify potentially malicious prompts and provide an early security screening mechanism before user inputs are processed by the target LLM.
 
