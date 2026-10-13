@@ -19,6 +19,7 @@ PromptLeakGuard/
 │   ├── predict.py    # prediction script  day16  /  day17 no code
 │   ├── embedding_day18_model.py    # Embedding space check
 │   ├── day18_classifier_decision_analysis.py    # Decision analysis for Logistic Regression classifiers.
+│   ├── compare_classifiers_bge_m3.py  #  SVM, Random Forest, XGBoost + BGE-M3
 │
 ├── models/
 │
